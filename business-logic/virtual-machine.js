@@ -2,11 +2,12 @@ import {
     isRunningVm,
     forceShutdown,
     softShutdown,
+    startVm as start,
 } from '../shell-commands/virtual-machine';
 
 const checkIsVmRunning = (sleepInSec, vmName) => {
     return new Promise((res) => {
-        const isVmRunning = isRunningVm();
+        const isVmRunning = isRunningVm(vmName);
         if (isVmRunning) {
             setTimeout(() => {
                 res(checkIsVmRunning(sleepInSec, vmName));
@@ -35,3 +36,6 @@ export function shutdownVmWithTimeout(
     return Promise.race([timeoutPromise, checkIsVmRunningPromise]);
 }
 
+export function startVm(vmName) {
+    start(vmName);
+}

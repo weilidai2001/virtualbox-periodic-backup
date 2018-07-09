@@ -1,6 +1,7 @@
 {
   "presets": [
     "env",
-    "jest"
+    "jest",
+    "es2017"
   ]
 }
