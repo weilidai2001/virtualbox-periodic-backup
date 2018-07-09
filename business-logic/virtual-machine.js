@@ -13,7 +13,7 @@ const checkIsVmRunning = (sleepInSec, vmName) => {
     });
 };
 
-export function shutdownVm(
+export function shutdownVmWithTimeout(
     vmName,
     statusCheckFrequencyInSec = 1,
     timeoutInSec = 180,
@@ -21,7 +21,10 @@ export function shutdownVm(
     console.log(`VM shutdown requested with status checking every ${statusCheckFrequencyInSec}s and a timeout of ${timeoutInSec}s`);
 
     const timeoutPromise = new Promise((res) => {
-        setTimeout(res, timeoutInSec * 1000);
+        setTimeout(() => {
+            forceShutdown();
+            res();
+        }, timeoutInSec * 1000);
     });
     const checkIsVmRunningPromise = checkIsVmRunning(statusCheckFrequencyInSec * 1000, vmName);
     return Promise.race([timeoutPromise, checkIsVmRunningPromise]);
