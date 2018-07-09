@@ -1,8 +1,8 @@
-import vmStatus from './vm-status';
+import { isRunningVm, forceShutdown } from '../shell-commands/virtual-machine';
 
 const checkIsVmRunning = (sleepInSec, vmName) => {
     return new Promise((res) => {
-        const isVmRunning = vmStatus();
+        const isVmRunning = isRunningVm();
         if (isVmRunning) {
             setTimeout(() => {
                 res(checkIsVmRunning(sleepInSec, vmName));
@@ -13,7 +13,7 @@ const checkIsVmRunning = (sleepInSec, vmName) => {
     });
 };
 
-export function shutdownVM(
+export function shutdownVm(
     vmName,
     statusCheckFrequencyInSec = 1,
     timeoutInSec = 180,
