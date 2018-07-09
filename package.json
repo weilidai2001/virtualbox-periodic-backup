@@ -1,0 +1,22 @@
+{
+  "name": "virtualbox-periodic-backup",
+  "version": "1.0.0",
+  "description": "Perform virtualbox image backup on Windows server",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weilidai2001/virtualbox-periodic-backup.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/weilidai2001/virtualbox-periodic-backup/issues"
+  },
+  "homepage": "https://github.com/weilidai2001/virtualbox-periodic-backup#readme",
+  "devDependencies": {
+    "jest": "^23.3.0"
+  }
+}
