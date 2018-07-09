@@ -1,4 +1,8 @@
-import { isRunningVm, forceShutdown } from '../shell-commands/virtual-machine';
+import {
+    isRunningVm,
+    forceShutdown,
+    softShutdown,
+} from '../shell-commands/virtual-machine';
 
 const checkIsVmRunning = (sleepInSec, vmName) => {
     return new Promise((res) => {
@@ -18,11 +22,12 @@ export function shutdownVmWithTimeout(
     statusCheckFrequencyInSec = 1,
     timeoutInSec = 180,
     ) {
+    softShutdown(vmName);
     console.log(`VM shutdown requested with status checking every ${statusCheckFrequencyInSec}s and a timeout of ${timeoutInSec}s`);
 
     const timeoutPromise = new Promise((res) => {
         setTimeout(() => {
-            forceShutdown();
+            forceShutdown(vmName);
             res();
         }, timeoutInSec * 1000);
     });

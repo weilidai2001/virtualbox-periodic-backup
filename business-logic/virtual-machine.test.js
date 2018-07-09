@@ -3,6 +3,13 @@ import {shutdownVmWithTimeout} from './virtual-machine';
 import * as shell from '../shell-commands/virtual-machine';
 
 describe('shutdownVm()', () => {
+    test('it calls softShutdown()', () => {
+        shell.softShutdown = jest.fn();
+        shutdownVmWithTimeout();
+
+        expect(shell.softShutdown.mock.calls.length).toBe(1);
+    });
+
     test('it calls isRunningVm()', () => {
         shell.isRunningVm = jest.fn();
         shutdownVmWithTimeout();
