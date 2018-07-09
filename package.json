@@ -4,7 +4,10 @@
   "description": "Perform virtualbox image backup on Windows server",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "node node_modules/jest/bin/jest.js",
+    "start:local": "NODE_ENV=localhost npm run babel-node -- warpcore/server.js",
+    "start": "npm run babel-node -- warpcore/server.js",
+    "babel-node": "babel-node --presets=es2015,stage-2"
   },
   "repository": {
     "type": "git",
@@ -16,7 +19,22 @@
     "url": "https://github.com/weilidai2001/virtualbox-periodic-backup/issues"
   },
   "homepage": "https://github.com/weilidai2001/virtualbox-periodic-backup#readme",
+  "dependencies": {
+    "babel-polyfill": "^6.23.0"
+  },
   "devDependencies": {
-    "jest": "^23.3.0"
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.25.0",
+    "babel-eslint": "^7.2.3",
+    "babel-jest": "^20.0.3",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-es2018": "^1.0.0",
+    "babel-preset-stage-2": "^6.24.1",
+    "jest": "^20.0.4"
+  },
+  "jest": {
+    "testURL": "http://localhost:8080",
+    "testEnvironment": "node"
   }
 }
