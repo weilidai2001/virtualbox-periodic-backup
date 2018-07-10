@@ -87,9 +87,9 @@ describe('copyVm()', () => {
     });
 
     test('it calls shell.copyFile() with new file name from timestamp', async () => {
-        const vmFileName = 'abc';
+        const vmFileName = 'abc.ext';
         const mockDateTimestamp = '2018-07-10T10:10:00.260Z';
-        const expectedNewFileName = vmFileName + ' ' + '2018-07-10T10_10_00.260Z';
+        const expectedNewFileName = 'abc 2018-07-10T10_10_00.260Z.ext';
         const srcDirectory = 'srcDir/dirA/';
         const destDirectory = 'destDir/dirB/';
         config.srcDirectory = srcDirectory;

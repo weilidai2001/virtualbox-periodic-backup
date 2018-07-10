@@ -72,7 +72,7 @@ export async function copyVm(vmFileName) {
     const timestamp = now().toISOString();
     const fileNameValidTimestamp = replaceAll(timestamp, ':', '_');
     const srcPath = config.srcDirectory + vmFileName;
-    const newFileName = `${vmFileName} ${fileNameValidTimestamp}`;
+    const newFileName = `${path.basename(vmFileName, path.extname(vmFileName))} ${fileNameValidTimestamp}${path.extname(vmFileName)}`;
     const destPath = config.destDirectory + newFileName;
     await copyFile(srcPath, destPath);
     return newFileName;

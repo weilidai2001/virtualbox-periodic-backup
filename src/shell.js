@@ -38,6 +38,7 @@ export async function startVm(vmName) {
 export async function copyFile(src, dest) {
     logger.info(`copying file from ${src} to ${dest}`);
     await fsExtra.copy(src, dest);
+    logger.info(`copied to ${dest}`)
 }
 
 export async function isFilesIdentical(src, dest) {
