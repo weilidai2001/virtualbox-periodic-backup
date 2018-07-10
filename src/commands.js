@@ -20,14 +20,16 @@ import config from './config';
 
 const checkIsVmRunning = (sleepInSec, vmName) => {
     return new Promise((res) => {
-        const isVmRunning = isRunningVm(vmName);
-        if (isVmRunning) {
-            setTimeout(() => {
-                res(checkIsVmRunning(sleepInSec, vmName));
-            }, sleepInSec);
-        } else {
-            res();
-        }
+        isRunningVm(vmName).then(isVmRunning => {
+            if (isVmRunning) {
+                setTimeout(() => {
+                    res(checkIsVmRunning(sleepInSec, vmName));
+                }, sleepInSec);
+            } else {
+                res();
+            }
+        });
+
     });
 };
 
@@ -52,7 +54,7 @@ export async function shutdownVmWithTimeout(
 }
 
 export function startVm(vmName) {
-    start(vmName);
+    return start(vmName);
 }
 
 export async function copyVm(vmFileName) {
@@ -72,7 +74,7 @@ export function checkVmCopiedCorrectly(srcFileName, destFileName) {
 }
 
 
-export function deleteOldestVmOverLimit(vmFileName, limit = 3) {
+export async function deleteOldestVmOverLimit(vmFileName, limit = 3) {
     const compareFileNameByDate = (a, b) => {
         const fileNameA = path.basename(a, path.extname(a));
         const fileNameB = path.basename(b, path.extname(b));
@@ -83,9 +85,9 @@ export function deleteOldestVmOverLimit(vmFileName, limit = 3) {
         return new Date(dateA) - new Date(dateB);
     };
 
-    const allBackupFiles = getAllFilesFromDirectory(config.destDirectory);
+    const allBackupFiles = await getAllFilesFromDirectory(config.destDirectory);
     const relevantBackupFiles = allBackupFiles.filter(file => path.basename(file).includes(vmFileName));
     const sortedByDate = relevantBackupFiles.sort(compareFileNameByDate);
     const noOfFilesToDelete = sortedByDate.length - limit > 0 ? sortedByDate.length - limit : 0;
-    sortedByDate.slice(0, noOfFilesToDelete).forEach(file => deleteFile(file));
+    sortedByDate.slice(0, noOfFilesToDelete).forEach(file => deleteFile(file).then());
 }

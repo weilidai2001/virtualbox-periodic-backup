@@ -14,7 +14,7 @@ jest.mock('./config');
 describe('shutdownVm()', () => {
     test('it calls softShutdown()', async () => {
         shell.softShutdown = jest.fn(() => Promise.resolve());
-        shell.isRunningVm = jest.fn(() => false);
+        shell.isRunningVm = jest.fn(() => Promise.resolve(false));
         await shutdownVmWithTimeout();
 
         expect(shell.softShutdown.mock.calls.length).toBe(1);
@@ -22,7 +22,7 @@ describe('shutdownVm()', () => {
 
     test('it calls isRunningVm()', async () => {
         shell.softShutdown = jest.fn(() => Promise.resolve());
-        shell.isRunningVm = jest.fn(() => false);
+        shell.isRunningVm = jest.fn(() => Promise.resolve(false));
         await shutdownVmWithTimeout();
 
         expect(shell.isRunningVm.mock.calls.length).toBeGreaterThan(0);
@@ -33,7 +33,7 @@ describe('shutdownVm()', () => {
         const delayInSeconds = 0.01;
         const timeoutInSeconds = 10;
         const responses = [...Array(9).fill(true), false];
-        shell.isRunningVm = jest.fn(() => responses.shift());
+        shell.isRunningVm = jest.fn(() => Promise.resolve(responses.shift()));
         shell.softShutdown = jest.fn(() => Promise.resolve());
         await shutdownVmWithTimeout(vmName, delayInSeconds, timeoutInSeconds);
 
@@ -45,7 +45,7 @@ describe('shutdownVm()', () => {
         const delayInSeconds = 0.01;
         const timeoutInSeconds = 0.05;
         const responses = [...Array(9).fill(true), false];
-        shell.isRunningVm = jest.fn(() => responses.shift());
+        shell.isRunningVm = jest.fn(() => Promise.resolve(responses.shift()));
         shell.softShutdown = jest.fn(() => Promise.resolve());
         shell.forceShutdown = jest.fn(() => Promise.resolve());
         await shutdownVmWithTimeout(vmName, delayInSeconds, timeoutInSeconds);
@@ -58,7 +58,7 @@ describe('shutdownVm()', () => {
         const delayInSeconds = 0.01;
         const timeoutInSeconds = 0.05;
         const responses = [...Array(9).fill(true), false];
-        shell.isRunningVm = jest.fn(() => responses.shift());
+        shell.isRunningVm = jest.fn(() => Promise.resolve(responses.shift()));
         shell.softShutdown = jest.fn(() => Promise.resolve());
         shell.forceShutdown = jest.fn(() => Promise.resolve());
 
@@ -70,18 +70,18 @@ describe('shutdownVm()', () => {
 });
 
 describe('startVm()', () => {
-    test('it calls shell.startVm()', () => {
-        shell.startVm = jest.fn();
-        startVm();
+    test('it calls shell.startVm()', async () => {
+        shell.startVm = jest.fn(() => Promise.resolve());
+        await startVm();
 
         expect(shell.startVm.mock.calls.length).toBe(1);
     });
 });
 
 describe('copyVm()', () => {
-    test('it calls shell.copyFile()', () => {
-        shell.copyFile = jest.fn();
-        copyVm();
+    test('it calls shell.copyFile()', async () => {
+        shell.copyFile = jest.fn(() => Promise.resolve());
+        await copyVm();
 
         expect(shell.copyFile.mock.calls.length).toBe(1);
     });
@@ -94,7 +94,7 @@ describe('copyVm()', () => {
         const destDirectory = 'destDir/dirB/';
         config.srcDirectory = srcDirectory;
         config.destDirectory = destDirectory;
-        shell.copyFile = jest.fn();
+        shell.copyFile = jest.fn(() => Promise.resolve());
         util.now = jest.fn(() => new Date(mockDateTimestamp));
         const newFilename = await copyVm(vmFileName);
 
@@ -108,7 +108,7 @@ describe('copyVm()', () => {
 });
 
 describe('checkVmCopiedCorrectly()', () => {
-    test('it calls shell.isFilesIdentical() with correct src and dest path', () => {
+    test('it calls shell.isFilesIdentical() with correct src and dest path', async () => {
         const srcFileName = 'FileA';
         const destFileName = 'FileB';
 
@@ -117,9 +117,9 @@ describe('checkVmCopiedCorrectly()', () => {
         config.srcDirectory = srcDirectory;
         config.destDirectory = destDirectory;
 
-        shell.isFilesIdentical = jest.fn();
+        shell.isFilesIdentical = jest.fn(() => Promise.resolve());
 
-        checkVmCopiedCorrectly(srcFileName, destFileName);
+        await checkVmCopiedCorrectly(srcFileName, destFileName);
 
         expect(shell.isFilesIdentical.mock.calls.length).toBe(1);
 
@@ -131,7 +131,7 @@ describe('checkVmCopiedCorrectly()', () => {
 });
 
 describe('deleteOldestVm()', () => {
-    test('it calls shell.deletFile() on the oldest filename', () => {
+    test('it calls shell.deletFile() on the oldest filename', async () => {
         const vmFileName = 'FileA';
         const fakeBackupFiles = [
             'backup_dir/WrongName 2018-07-07T10_10_00.260Z.ext',
@@ -140,10 +140,10 @@ describe('deleteOldestVm()', () => {
             'backup_dir/FileA 2018-07-10T10_10_00.260Z.ext',
         ];
 
-        shell.getAllFilesFromDirectory = jest.fn(() => fakeBackupFiles);
-        shell.deleteFile = jest.fn();
+        shell.getAllFilesFromDirectory = jest.fn(() => Promise.resolve(fakeBackupFiles));
+        shell.deleteFile = jest.fn(() => Promise.resolve());
 
-        deleteOldestVmOverLimit(vmFileName, 2);
+        await deleteOldestVmOverLimit(vmFileName, 2);
 
         expect(shell.getAllFilesFromDirectory.mock.calls.length).toBe(1);
         expect(shell.deleteFile.mock.calls.length).toBe(1);
@@ -153,7 +153,7 @@ describe('deleteOldestVm()', () => {
         expect(deletedFile).toBe('backup_dir/FileA 2018-07-08T10_10_00.260Z.ext');
     });
 
-    test('it doesn`t call shell.deletFile() if limit not met', () => {
+    test('it doesn`t call shell.deletFile() if limit not met', async () => {
         const limit = 5;
         const vmFileName = 'FileA';
         const fakeBackupFiles = [
@@ -163,17 +163,17 @@ describe('deleteOldestVm()', () => {
             'backup_dir/FileA 2018-07-10T10_10_00.260Z.ext',
         ];
 
-        shell.getAllFilesFromDirectory = jest.fn(() => fakeBackupFiles);
-        shell.deleteFile = jest.fn();
+        shell.getAllFilesFromDirectory = jest.fn(() => Promise.resolve(fakeBackupFiles));
+        shell.deleteFile = jest.fn(() => Promise.resolve());
 
-        deleteOldestVmOverLimit(vmFileName, limit);
+        await deleteOldestVmOverLimit(vmFileName, limit);
 
         expect(shell.getAllFilesFromDirectory.mock.calls.length).toBe(1);
         expect(shell.deleteFile.mock.calls.length).toBe(0);
 
     });
 
-    test('it calls shell.deletFile() on the 3 oldest filenames over the limit', () => {
+    test('it calls shell.deletFile() on the 3 oldest filenames over the limit', async () => {
         const vmFileName = 'FileA';
         const fakeBackupFiles = [
             'backup_dir/WrongName 2018-07-07T10_10_00.260Z.ext',
@@ -185,10 +185,10 @@ describe('deleteOldestVm()', () => {
             'backup_dir/FileA 2018-07-10T10_10_00.260Z.ext',
         ];
 
-        shell.getAllFilesFromDirectory = jest.fn(() => fakeBackupFiles);
-        shell.deleteFile = jest.fn();
+        shell.getAllFilesFromDirectory = jest.fn(() => Promise.resolve(fakeBackupFiles));
+        shell.deleteFile = jest.fn(() => Promise.resolve());
 
-        deleteOldestVmOverLimit(vmFileName, 3);
+        await deleteOldestVmOverLimit(vmFileName, 3);
 
         expect(shell.getAllFilesFromDirectory.mock.calls.length).toBe(1);
         expect(shell.deleteFile.mock.calls.length).toBe(3);
