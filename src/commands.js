@@ -55,13 +55,13 @@ export function startVm(vmName) {
     start(vmName);
 }
 
-export function copyVm(vmFileName) {
+export async function copyVm(vmFileName) {
     const timestamp = now().toISOString();
     const fileNameValidTimestamp = replaceAll(timestamp, ':', '_');
     const srcPath = config.srcDirectory + vmFileName;
     const newFileName = `${vmFileName} ${fileNameValidTimestamp}`;
     const destPath = config.destDirectory + newFileName;
-    copyFile(srcPath, destPath);
+    await copyFile(srcPath, destPath);
     return newFileName;
 }
 

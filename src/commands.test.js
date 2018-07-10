@@ -86,7 +86,7 @@ describe('copyVm()', () => {
         expect(shell.copyFile.mock.calls.length).toBe(1);
     });
 
-    test('it calls shell.copyFile() with new file name from timestamp', () => {
+    test('it calls shell.copyFile() with new file name from timestamp', async () => {
         const vmFileName = 'abc';
         const mockDateTimestamp = '2018-07-10T10:10:00.260Z';
         const expectedNewFileName = vmFileName + ' ' + '2018-07-10T10_10_00.260Z';
@@ -96,7 +96,7 @@ describe('copyVm()', () => {
         config.destDirectory = destDirectory;
         shell.copyFile = jest.fn();
         util.now = jest.fn(() => new Date(mockDateTimestamp));
-        const newFilename = copyVm(vmFileName);
+        const newFilename = await copyVm(vmFileName);
 
         expect(shell.copyFile.mock.calls.length).toBe(1);
 
