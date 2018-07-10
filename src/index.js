@@ -4,7 +4,7 @@ import {
     checkVmCopiedCorrectly,
     deleteOldestVmOverLimit,
 } from './commands';
-import * as shell from './shell';
+
 import config from './config';
 
 (async function(){

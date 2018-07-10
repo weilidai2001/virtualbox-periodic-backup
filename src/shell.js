@@ -1,7 +1,9 @@
 import logger from './logger';
 import config from './config';
 import exec from './exec';
-import fs from 'fs-extra';
+import fsExtra from 'fs-extra';
+import util from 'util';
+const stat = util.promisify(require('fs').stat);
 
 export async function isRunningVm(vmName) {
     const command = `${config.virtualBoxExecPath} list runningvms`;
@@ -31,12 +33,19 @@ export async function startVm(vmName) {
 
 export async function copyFile(src, dest) {
     logger.info(`copying file from ${src} to ${dest}`);
-    await fs.copy(src, dest);
+    await fsExtra.copy(src, dest);
 }
 
-export function isFilesIdentical(src, dest) {
-    logger.info(`comparing file ${src} and ${dest}`);
-    return true;
+export async function isFilesIdentical(src, dest) {
+    const {size: srcSize} = await stat(src);
+    const {size: destSize} = await stat(dest);
+    const isSame = srcSize === destSize;
+    if (isSame) {
+        logger.info(`files are identical "${src}" and "${dest}"`);
+    } else {
+        logger.info(`files are different "${src}" and "${dest}". ${srcSize} vs ${destSize}`);
+    }
+    return isSame;
 }
 
 export function getAllFilesFromDirectory(directory) {
