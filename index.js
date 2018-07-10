@@ -1,5 +1,9 @@
-import {shutdownVmWithTimeout} from './business-logic/virtual-machine';
+import {shutdownVmWithTimeout} from './commands';
 
 (async function(){
-    await shutdownVmWithTimeout('vmName');
+    const vmName = '';
+    await shutdownVmWithTimeout(vmName);
+    const newName = await copyVm(vmName);
+    await checkVmCopiedCorrectly(vmName, newName);
+    await deleteOldestVm(vmName);
 })();

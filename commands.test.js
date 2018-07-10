@@ -1,6 +1,6 @@
 import "babel-polyfill"
-import {shutdownVmWithTimeout} from './virtual-machine';
-import * as shell from '../shell-commands/virtual-machine';
+import { shutdownVmWithTimeout } from './commands';
+import * as shell from './shell';
 
 describe('shutdownVm()', () => {
     test('it calls softShutdown()', () => {

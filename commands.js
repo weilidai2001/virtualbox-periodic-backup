@@ -3,7 +3,7 @@ import {
     forceShutdown,
     softShutdown,
     startVm as start,
-} from '../shell-commands/virtual-machine';
+} from './shell';
 
 const checkIsVmRunning = (sleepInSec, vmName) => {
     return new Promise((res) => {
