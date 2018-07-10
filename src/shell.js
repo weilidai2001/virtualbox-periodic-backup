@@ -3,7 +3,11 @@ import config from './config';
 import exec from './exec';
 import fsExtra from 'fs-extra';
 import util from 'util';
-const stat = util.promisify(require('fs').stat);
+import path from 'path';
+import fs from 'fs';
+const stat = util.promisify(fs.stat);
+const readDir = util.promisify(fs.readdir);
+const unlink = util.promisify(fs.unlink);
 
 export async function isRunningVm(vmName) {
     const command = `${config.virtualBoxExecPath} list runningvms`;
@@ -48,11 +52,13 @@ export async function isFilesIdentical(src, dest) {
     return isSame;
 }
 
-export function getAllFilesFromDirectory(directory) {
+export async function getAllFilesFromDirectory(directory) {
     logger.info(`retrieving files from ${directory}`);
-    return [];
+    const files = await readDir(directory);
+    return files.map(file => path.join(directory, file));
 }
 
-export function deleteFile(path) {
+export async function deleteFile(path) {
     logger.info(`deleting file ${path}`);
+    await unlink(path);
 }
