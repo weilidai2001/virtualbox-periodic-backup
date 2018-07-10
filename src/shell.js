@@ -1,38 +1,40 @@
+import logger from './logger';
+
 export function isRunningVm(vmName) {
-    console.log(`checking if ${vmName} is running`);
+    logger.info(`checking if ${vmName} is running`);
     return true;
 }
 
 export function forceShutdown(vmName) {
-    console.log(`forcing ${vmName} to shutdown`);
+    logger.info(`forcing ${vmName} to shutdown`);
     return true;
 }
 
 export function softShutdown(vmName) {
-    console.log(`soft shutdown ${vmName}`);
+    logger.info(`soft shutdown ${vmName}`);
     return true;
 }
 
 export function startVm(vmName) {
-    console.log(`starting ${vmName}`);
+    logger.info(`starting ${vmName}`);
     return true;
 }
 
 export function copyFile(src, dest) {
-    console.log(`copying file from ${src} to ${dest}`);
+    logger.info(`copying file from ${src} to ${dest}`);
     return true;
 }
 
 export function isFilesIdentical(src, dest) {
-    console.log(`comparing file ${src} and ${dest}`);
+    logger.info(`comparing file ${src} and ${dest}`);
     return true;
 }
 
 export function getAllFilesFromDirectory(directory) {
-    console.log(`retrieving files from ${directory}`);
+    logger.info(`retrieving files from ${directory}`);
     return [];
 }
 
 export function deleteFile(path) {
-    console.log(`deleting file ${path}`);
+    logger.info(`deleting file ${path}`);
 }

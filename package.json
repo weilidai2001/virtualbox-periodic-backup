@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node node_modules/jest/bin/jest.js",
-    "start:local": "NODE_ENV=localhost npm run babel-node -- warpcore/server.js",
-    "start": "npm run babel-node index.js",
+    "start": "npm run babel-node src/index.js",
     "babel-node": "babel-node"
   },
   "repository": {
@@ -20,10 +19,11 @@
   },
   "homepage": "https://github.com/weilidai2001/virtualbox-periodic-backup#readme",
   "dependencies": {
+    "app-root-path": "^2.1.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-es2017": "^6.24.1",
     "babel-preset-es2018": "^1.0.0",
-    "lodash": "^4.17.10"
+    "winston": "^3.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

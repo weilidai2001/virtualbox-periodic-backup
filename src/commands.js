@@ -1,5 +1,5 @@
 import path from 'path';
-import _ from 'lodash';
+import logger from './logger';
 import {
     isRunningVm,
     forceShutdown,
@@ -36,8 +36,9 @@ export function shutdownVmWithTimeout(
     statusCheckFrequencyInSec = 1,
     timeoutInSec = 180,
     ) {
+    logger.info(`VM shutdown requested with status checking every ${statusCheckFrequencyInSec}s and a timeout of ${timeoutInSec}s`);
+
     softShutdown(vmName);
-    console.log(`VM shutdown requested with status checking every ${statusCheckFrequencyInSec}s and a timeout of ${timeoutInSec}s`);
 
     const timeoutPromise = new Promise((res) => {
         setTimeout(() => {
