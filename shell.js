@@ -22,3 +22,8 @@ export function copyFile(src, dest) {
     console.log(`copying file from ${src} to ${dest}`);
     return true;
 }
+
+export function isFilesIdentical(src, dest) {
+    console.log(`comparing file ${src} and ${dest}`);
+    return true;
+}

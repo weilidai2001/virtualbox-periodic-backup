@@ -1,5 +1,9 @@
 import "babel-polyfill"
-import { shutdownVmWithTimeout, startVm, copyVm } from './commands';
+import { shutdownVmWithTimeout,
+    startVm,
+    copyVm,
+    checkVmCopiedCorrectly,
+} from './commands';
 import * as shell from './shell';
 import * as util from './util';
 import config from './config';
@@ -92,5 +96,28 @@ describe('copyVm()', () => {
         expect(newFilename).toBe(expectedNewFileName);
         expect(src).toBe(srcDirectory + vmFileName);
         expect(dest).toBe(destDirectory + expectedNewFileName);
+    });
+});
+
+describe('checkVmCopiedCorrectly()', () => {
+    test('it calls shell.isFilesIdentical() with correct src and dest path', () => {
+        const srcFileName = 'FileA';
+        const destFileName = 'FileB';
+
+        const srcDirectory = 'srcDir/dirA/';
+        const destDirectory = 'destDir/dirB/';
+        config.srcDirectory = srcDirectory;
+        config.destDirectory = destDirectory;
+
+        shell.isFilesIdentical = jest.fn();
+
+        checkVmCopiedCorrectly(srcFileName, destFileName);
+
+        expect(shell.isFilesIdentical.mock.calls.length).toBe(1);
+
+        const [src, dest] = shell.isFilesIdentical.mock.calls[0];
+
+        expect(src).toBe(srcDirectory + srcFileName);
+        expect(dest).toBe(destDirectory + destFileName);
     });
 });

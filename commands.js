@@ -4,6 +4,7 @@ import {
     softShutdown,
     startVm as start,
     copyFile,
+    isFilesIdentical,
 } from './shell';
 
 import {
@@ -56,4 +57,11 @@ export function copyVm(vmFileName) {
     const destPath = config.destDirectory + newFileName;
     copyFile(srcPath, destPath);
     return newFileName;
+}
+
+
+export function checkVmCopiedCorrectly(srcFileName, destFileName) {
+    const srcPath = config.srcDirectory + srcFileName;
+    const destPath = config.destDirectory + destFileName;
+    return isFilesIdentical(srcPath, destPath);
 }

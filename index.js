@@ -1,6 +1,7 @@
 import {
     shutdownVmWithTimeout,
-    copyVm
+    copyVm,
+    checkVmCopiedCorrectly,
 } from './commands';
 
 import config from './config';
