@@ -22,7 +22,8 @@
   "dependencies": {
     "babel-polyfill": "^6.23.0",
     "babel-preset-es2017": "^6.24.1",
-    "babel-preset-es2018": "^1.0.0"
+    "babel-preset-es2018": "^1.0.0",
+    "lodash": "^4.17.10"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

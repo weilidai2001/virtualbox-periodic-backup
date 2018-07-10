@@ -27,3 +27,12 @@ export function isFilesIdentical(src, dest) {
     console.log(`comparing file ${src} and ${dest}`);
     return true;
 }
+
+export function getAllFilesFromDirectory(directory) {
+    console.log(`retrieving files from ${directory}`);
+    return [];
+}
+
+export function deleteFile(path) {
+    console.log(`deleting file ${path}`);
+}

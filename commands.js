@@ -1,3 +1,5 @@
+import path from 'path';
+import _ from 'lodash';
 import {
     isRunningVm,
     forceShutdown,
@@ -5,6 +7,8 @@ import {
     startVm as start,
     copyFile,
     isFilesIdentical,
+    getAllFilesFromDirectory,
+    deleteFile,
 } from './shell';
 
 import {
@@ -59,9 +63,27 @@ export function copyVm(vmFileName) {
     return newFileName;
 }
 
-
 export function checkVmCopiedCorrectly(srcFileName, destFileName) {
     const srcPath = config.srcDirectory + srcFileName;
     const destPath = config.destDirectory + destFileName;
     return isFilesIdentical(srcPath, destPath);
+}
+
+
+export function deleteOldestVmOverLimit(vmFileName, limit = 3) {
+    const compareFileNameByDate = (a, b) => {
+        const fileNameA = path.basename(a, path.extname(a));
+        const fileNameB = path.basename(b, path.extname(b));
+
+        const dateA = replaceAll(fileNameA.split(' ')[1], '_', ':');
+        const dateB = replaceAll(fileNameB.split(' ')[1], '_', ':');
+
+        return new Date(dateA) - new Date(dateB);
+    };
+
+    const allBackupFiles = getAllFilesFromDirectory(config.destDirectory);
+    const relevantBackupFiles = allBackupFiles.filter(file => path.basename(file).includes(vmFileName));
+    const sortedByDate = relevantBackupFiles.sort(compareFileNameByDate);
+    const noOfFilesToDelete = sortedByDate.length - limit > 0 ? sortedByDate.length - limit : 0;
+    sortedByDate.slice(0, noOfFilesToDelete).forEach(file => deleteFile(file));
 }

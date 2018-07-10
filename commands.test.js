@@ -3,6 +3,7 @@ import { shutdownVmWithTimeout,
     startVm,
     copyVm,
     checkVmCopiedCorrectly,
+    deleteOldestVmOverLimit,
 } from './commands';
 import * as shell from './shell';
 import * as util from './util';
@@ -119,5 +120,78 @@ describe('checkVmCopiedCorrectly()', () => {
 
         expect(src).toBe(srcDirectory + srcFileName);
         expect(dest).toBe(destDirectory + destFileName);
+    });
+});
+
+describe('deleteOldestVm()', () => {
+    test('it calls shell.deletFile() on the oldest filename', () => {
+        const vmFileName = 'FileA';
+        const fakeBackupFiles = [
+            'backup_dir/WrongName 2018-07-07T10_10_00.260Z.ext',
+            'backup_dir/FileA 2018-07-08T10_10_00.260Z.ext',
+            'backup_dir/FileA 2018-07-09T10_10_00.260Z.ext',
+            'backup_dir/FileA 2018-07-10T10_10_00.260Z.ext',
+        ];
+
+        shell.getAllFilesFromDirectory = jest.fn(() => fakeBackupFiles);
+        shell.deleteFile = jest.fn();
+
+        deleteOldestVmOverLimit(vmFileName, 2);
+
+        expect(shell.getAllFilesFromDirectory.mock.calls.length).toBe(1);
+        expect(shell.deleteFile.mock.calls.length).toBe(1);
+
+        const [deletedFile] = shell.deleteFile.mock.calls[0];
+
+        expect(deletedFile).toBe('backup_dir/FileA 2018-07-08T10_10_00.260Z.ext');
+    });
+
+    test('it doesn`t call shell.deletFile() if limit not met', () => {
+        const limit = 5;
+        const vmFileName = 'FileA';
+        const fakeBackupFiles = [
+            'backup_dir/WrongName 2018-07-07T10_10_00.260Z.ext',
+            'backup_dir/FileA 2018-07-08T10_10_00.260Z.ext',
+            'backup_dir/FileA 2018-07-09T10_10_00.260Z.ext',
+            'backup_dir/FileA 2018-07-10T10_10_00.260Z.ext',
+        ];
+
+        shell.getAllFilesFromDirectory = jest.fn(() => fakeBackupFiles);
+        shell.deleteFile = jest.fn();
+
+        deleteOldestVmOverLimit(vmFileName, limit);
+
+        expect(shell.getAllFilesFromDirectory.mock.calls.length).toBe(1);
+        expect(shell.deleteFile.mock.calls.length).toBe(0);
+
+    });
+
+    test('it calls shell.deletFile() on the 3 oldest filenames over the limit', () => {
+        const vmFileName = 'FileA';
+        const fakeBackupFiles = [
+            'backup_dir/WrongName 2018-07-07T10_10_00.260Z.ext',
+            'backup_dir/FileA 2018-07-06T10_10_00.260Z.ext',
+            'backup_dir/FileA 2018-07-05T10_10_00.260Z.ext',
+            'backup_dir/FileA 2018-07-07T10_10_00.260Z.ext',
+            'backup_dir/FileA 2018-07-08T10_10_00.260Z.ext',
+            'backup_dir/FileA 2018-07-09T10_10_00.260Z.ext',
+            'backup_dir/FileA 2018-07-10T10_10_00.260Z.ext',
+        ];
+
+        shell.getAllFilesFromDirectory = jest.fn(() => fakeBackupFiles);
+        shell.deleteFile = jest.fn();
+
+        deleteOldestVmOverLimit(vmFileName, 3);
+
+        expect(shell.getAllFilesFromDirectory.mock.calls.length).toBe(1);
+        expect(shell.deleteFile.mock.calls.length).toBe(3);
+
+        const [deletedFile1] = shell.deleteFile.mock.calls[0];
+        const [deletedFile2] = shell.deleteFile.mock.calls[1];
+        const [deletedFile3] = shell.deleteFile.mock.calls[2];
+
+        expect(deletedFile1).toBe('backup_dir/FileA 2018-07-05T10_10_00.260Z.ext');
+        expect(deletedFile2).toBe('backup_dir/FileA 2018-07-06T10_10_00.260Z.ext');
+        expect(deletedFile3).toBe('backup_dir/FileA 2018-07-07T10_10_00.260Z.ext');
     });
 });

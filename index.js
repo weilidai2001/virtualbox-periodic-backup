@@ -2,6 +2,7 @@ import {
     shutdownVmWithTimeout,
     copyVm,
     checkVmCopiedCorrectly,
+    deleteOldestVmOverLimit,
 } from './commands';
 
 import config from './config';
@@ -12,5 +13,5 @@ import config from './config';
     await shutdownVmWithTimeout(vmName);
     const newName = await copyVm(vmFileName);
     await checkVmCopiedCorrectly(vmFileName, newName);
-    await deleteOldestVm(vmName);
+    await deleteOldestVmOverLimit(vmName);
 })();
