@@ -3,6 +3,7 @@ import {
     copyVm,
     checkVmCopiedCorrectly,
     deleteOldestVmOverLimit,
+    startVm,
 } from './commands';
 
 import config from './config';
@@ -14,4 +15,5 @@ import config from './config';
     const newName = await copyVm(vmFileName);
     await checkVmCopiedCorrectly(vmFileName, newName);
     await deleteOldestVmOverLimit(vmName);
+    await startVm(vmName);
 })();

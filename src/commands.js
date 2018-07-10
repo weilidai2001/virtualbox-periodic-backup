@@ -40,17 +40,28 @@ export async function shutdownVmWithTimeout(
     ) {
     logger.info(`VM shutdown requested with status checking every ${statusCheckFrequencyInSec}s and a timeout of ${timeoutInSec}s`);
 
-    await softShutdown(vmName);
+    try {
+        await softShutdown(vmName);
+    } catch (ex) {
+        // continue
+    }
 
+    let wait;
     const timeoutPromise = new Promise((res) => {
-        setTimeout(() => {
+        wait = setTimeout(() => {
             forceShutdown(vmName).then(() => {
+                res();
+            }).catch(err => {
                 res();
             });
         }, timeoutInSec * 1000);
     });
     const checkIsVmRunningPromise = checkIsVmRunning(statusCheckFrequencyInSec * 1000, vmName);
-    return Promise.race([timeoutPromise, checkIsVmRunningPromise]);
+    await Promise.race([timeoutPromise, checkIsVmRunningPromise]);
+
+    if (wait) {
+        clearTimeout(wait);
+    }
 }
 
 export function startVm(vmName) {
@@ -89,5 +100,5 @@ export async function deleteOldestVmOverLimit(vmFileName, limit = 3) {
     const relevantBackupFiles = allBackupFiles.filter(file => path.basename(file).includes(vmFileName));
     const sortedByDate = relevantBackupFiles.sort(compareFileNameByDate);
     const noOfFilesToDelete = sortedByDate.length - limit > 0 ? sortedByDate.length - limit : 0;
-    sortedByDate.slice(0, noOfFilesToDelete).forEach(file => deleteFile(file).then());
+    await sortedByDate.slice(0, noOfFilesToDelete).map(file => deleteFile(file));
 }
