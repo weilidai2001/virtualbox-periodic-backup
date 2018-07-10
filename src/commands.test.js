@@ -1,5 +1,6 @@
 import "babel-polyfill"
-import { shutdownVmWithTimeout,
+import {
+    shutdownVmWithTimeout,
     startVm,
     copyVm,
     checkVmCopiedCorrectly,
@@ -20,7 +21,7 @@ describe('shutdownVm()', () => {
     });
 
     test('it calls isRunningVm()', async () => {
-        shell.isRunningVm = jest.fn(() => Promise.resolve());
+        shell.softShutdown = jest.fn(() => Promise.resolve());
         shell.isRunningVm = jest.fn(() => false);
         await shutdownVmWithTimeout();
 
@@ -33,6 +34,7 @@ describe('shutdownVm()', () => {
         const timeoutInSeconds = 10;
         const responses = [...Array(9).fill(true), false];
         shell.isRunningVm = jest.fn(() => responses.shift());
+        shell.softShutdown = jest.fn(() => Promise.resolve());
         await shutdownVmWithTimeout(vmName, delayInSeconds, timeoutInSeconds);
 
         expect(shell.isRunningVm.mock.calls.length).toBe(10);
@@ -44,6 +46,8 @@ describe('shutdownVm()', () => {
         const timeoutInSeconds = 0.05;
         const responses = [...Array(9).fill(true), false];
         shell.isRunningVm = jest.fn(() => responses.shift());
+        shell.softShutdown = jest.fn(() => Promise.resolve());
+        shell.forceShutdown = jest.fn(() => Promise.resolve());
         await shutdownVmWithTimeout(vmName, delayInSeconds, timeoutInSeconds);
 
         expect(shell.isRunningVm.mock.calls.length).toBe(5);
@@ -55,7 +59,8 @@ describe('shutdownVm()', () => {
         const timeoutInSeconds = 0.05;
         const responses = [...Array(9).fill(true), false];
         shell.isRunningVm = jest.fn(() => responses.shift());
-        shell.forceShutdown = jest.fn();
+        shell.softShutdown = jest.fn(() => Promise.resolve());
+        shell.forceShutdown = jest.fn(() => Promise.resolve());
 
         await shutdownVmWithTimeout(vmName, delayInSeconds, timeoutInSeconds);
 

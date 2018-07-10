@@ -1,17 +1,20 @@
 import logger from './logger';
 import config from './config';
 import exec from './exec';
+import fs from 'fs-extra';
 
 export async function isRunningVm(vmName) {
-    logger.info(`checking if ${vmName} is running`);
     const command = `${config.virtualBoxExecPath} list runningvms`;
     const { stdout } = await exec(command);
-    return !!stdout.split('\n').filter(line => line.match(/"([^"]+)"/) && line.match(/"([^"]+)"/)[1] === vmName).length;
+    const isRunning = !!stdout.split('\n').filter(line => line.match(/"([^"]+)"/) && line.match(/"([^"]+)"/)[1] === vmName).length;
+    logger.info(`${vmName} is ${isRunning ? 'running': 'not running'}`);
+    return isRunning;
 }
 
-export function forceShutdown(vmName) {
+export async function forceShutdown(vmName) {
     logger.info(`forcing ${vmName} to shutdown`);
-    return true;
+    const command = `${config.virtualBoxExecPath} controlvm ${vmName} poweroff`;
+    await exec(command);
 }
 
 export async function softShutdown(vmName) {
@@ -20,14 +23,15 @@ export async function softShutdown(vmName) {
     await exec(command);
 }
 
-export function startVm(vmName) {
+export async function startVm(vmName) {
     logger.info(`starting ${vmName}`);
-    return true;
+    const command = `${config.virtualBoxExecPath} startvm "${vmName}" --type "headless"`;
+    await exec(command);
 }
 
-export function copyFile(src, dest) {
+export async function copyFile(src, dest) {
     logger.info(`copying file from ${src} to ${dest}`);
-    return true;
+    await fs.copy(src, dest);
 }
 
 export function isFilesIdentical(src, dest) {

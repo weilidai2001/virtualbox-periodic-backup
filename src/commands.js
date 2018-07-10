@@ -42,8 +42,9 @@ export async function shutdownVmWithTimeout(
 
     const timeoutPromise = new Promise((res) => {
         setTimeout(() => {
-            forceShutdown(vmName);
-            res();
+            forceShutdown(vmName).then(() => {
+                res();
+            });
         }, timeoutInSec * 1000);
     });
     const checkIsVmRunningPromise = checkIsVmRunning(statusCheckFrequencyInSec * 1000, vmName);
