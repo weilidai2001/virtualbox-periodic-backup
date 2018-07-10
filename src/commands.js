@@ -31,14 +31,14 @@ const checkIsVmRunning = (sleepInSec, vmName) => {
     });
 };
 
-export function shutdownVmWithTimeout(
+export async function shutdownVmWithTimeout(
     vmName,
     statusCheckFrequencyInSec = 1,
     timeoutInSec = 180,
     ) {
     logger.info(`VM shutdown requested with status checking every ${statusCheckFrequencyInSec}s and a timeout of ${timeoutInSec}s`);
 
-    softShutdown(vmName);
+    await softShutdown(vmName);
 
     const timeoutPromise = new Promise((res) => {
         setTimeout(() => {

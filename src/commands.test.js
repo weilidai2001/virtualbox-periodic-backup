@@ -11,16 +11,18 @@ import config from './config';
 jest.mock('./config');
 
 describe('shutdownVm()', () => {
-    test('it calls softShutdown()', () => {
-        shell.softShutdown = jest.fn();
-        shutdownVmWithTimeout();
+    test('it calls softShutdown()', async () => {
+        shell.softShutdown = jest.fn(() => Promise.resolve());
+        shell.isRunningVm = jest.fn(() => false);
+        await shutdownVmWithTimeout();
 
         expect(shell.softShutdown.mock.calls.length).toBe(1);
     });
 
-    test('it calls isRunningVm()', () => {
-        shell.isRunningVm = jest.fn();
-        shutdownVmWithTimeout();
+    test('it calls isRunningVm()', async () => {
+        shell.isRunningVm = jest.fn(() => Promise.resolve());
+        shell.isRunningVm = jest.fn(() => false);
+        await shutdownVmWithTimeout();
 
         expect(shell.isRunningVm.mock.calls.length).toBeGreaterThan(0);
     });

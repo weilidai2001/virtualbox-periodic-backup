@@ -1,8 +1,12 @@
 import logger from './logger';
+import config from './config';
+import exec from './exec';
 
-export function isRunningVm(vmName) {
+export async function isRunningVm(vmName) {
     logger.info(`checking if ${vmName} is running`);
-    return true;
+    const command = `${config.virtualBoxExecPath} list runningvms`;
+    const { stdout } = await exec(command);
+    return !!stdout.split('\n').filter(line => line.match(/"([^"]+)"/) && line.match(/"([^"]+)"/)[1] === vmName).length;
 }
 
 export function forceShutdown(vmName) {
@@ -10,9 +14,10 @@ export function forceShutdown(vmName) {
     return true;
 }
 
-export function softShutdown(vmName) {
+export async function softShutdown(vmName) {
     logger.info(`soft shutdown ${vmName}`);
-    return true;
+    const command = `${config.virtualBoxExecPath} controlvm ${vmName} acpipowerbutton`;
+    await exec(command);
 }
 
 export function startVm(vmName) {
