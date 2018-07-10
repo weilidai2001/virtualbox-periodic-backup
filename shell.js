@@ -17,3 +17,8 @@ export function startVm(vmName) {
     console.log(`starting ${vmName}`);
     return true;
 }
+
+export function copyFile(src, dest) {
+    console.log(`copying file from ${src} to ${dest}`);
+    return true;
+}

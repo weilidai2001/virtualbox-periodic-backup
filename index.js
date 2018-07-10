@@ -1,9 +1,15 @@
-import {shutdownVmWithTimeout} from './commands';
+import {
+    shutdownVmWithTimeout,
+    copyVm
+} from './commands';
+
+import config from './config';
 
 (async function(){
-    const vmName = '';
+    const vmName = config.vmName;
+    const vmFileName = config.vmFileName;
     await shutdownVmWithTimeout(vmName);
-    const newName = await copyVm(vmName);
-    await checkVmCopiedCorrectly(vmName, newName);
+    const newName = await copyVm(vmFileName);
+    await checkVmCopiedCorrectly(vmFileName, newName);
     await deleteOldestVm(vmName);
 })();

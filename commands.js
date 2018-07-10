@@ -3,7 +3,15 @@ import {
     forceShutdown,
     softShutdown,
     startVm as start,
+    copyFile,
 } from './shell';
+
+import {
+    replaceAll,
+    now,
+} from "./util";
+
+import config from './config';
 
 const checkIsVmRunning = (sleepInSec, vmName) => {
     return new Promise((res) => {
@@ -38,4 +46,14 @@ export function shutdownVmWithTimeout(
 
 export function startVm(vmName) {
     start(vmName);
+}
+
+export function copyVm(vmFileName) {
+    const timestamp = now().toISOString();
+    const fileNameValidTimestamp = replaceAll(timestamp, ':', '_');
+    const srcPath = config.srcDirectory + vmFileName;
+    const newFileName = `${vmFileName} ${fileNameValidTimestamp}`;
+    const destPath = config.destDirectory + newFileName;
+    copyFile(srcPath, destPath);
+    return newFileName;
 }
