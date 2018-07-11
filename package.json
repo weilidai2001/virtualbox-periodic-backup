@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node node_modules/jest/bin/jest.js",
-    "start": "npm run babel-node src/index.js",
+    "start": "npm run babel-node src/server/routes.js",
     "babel-node": "babel-node"
   },
   "repository": {
@@ -23,6 +23,7 @@
     "babel-polyfill": "^6.23.0",
     "babel-preset-es2017": "^6.24.1",
     "babel-preset-es2018": "^1.0.0",
+    "express": "^4.16.3",
     "fs-extra": "^6.0.1",
     "winston": "^3.0.0"
   },
