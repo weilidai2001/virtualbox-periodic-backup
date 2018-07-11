@@ -26,8 +26,8 @@ app.get('/backup', (req, res) => {
 
     (async function doBackup(){
         currentStatus = 'Beginning backup';
-        const vmName = config.vmName;
-        const vmFileName = config.vmFileName;
+        const vmName = req.query.vmName || config.vmName;
+        const vmFileName = req.query.vmFileName || config.vmFileName;
 
         currentStatus = 'Waiting for shutdown';
         await shutdownVmWithTimeout(vmName);
