@@ -18,12 +18,12 @@ import {
 
 import config from './config';
 
-const checkIsVmRunning = (sleepInSec, vmName) => {
+const periodicallyCheckIsVmRunningUntilNotRunning = (sleepInSec, vmName) => {
     return new Promise((res) => {
         isRunningVm(vmName).then(isVmRunning => {
             if (isVmRunning) {
                 setTimeout(() => {
-                    res(checkIsVmRunning(sleepInSec, vmName));
+                    res(periodicallyCheckIsVmRunningUntilNotRunning(sleepInSec, vmName));
                 }, sleepInSec);
             } else {
                 res();
@@ -40,11 +40,11 @@ export async function shutdownVmWithTimeout(
     ) {
     logger.info(`VM shutdown requested with status checking every ${statusCheckFrequencyInSec}s and a timeout of ${timeoutInSec}s`);
 
-    try {
-        await softShutdown(vmName);
-    } catch (ex) {
-        // continue
+    if (!await isRunningVm()) {
+        return;
     }
+
+    await softShutdown(vmName);
 
     let wait;
     const timeoutPromise = new Promise((res) => {
@@ -56,7 +56,7 @@ export async function shutdownVmWithTimeout(
             });
         }, timeoutInSec * 1000);
     });
-    const checkIsVmRunningPromise = checkIsVmRunning(statusCheckFrequencyInSec * 1000, vmName);
+    const checkIsVmRunningPromise = periodicallyCheckIsVmRunningUntilNotRunning(statusCheckFrequencyInSec * 1000, vmName);
     await Promise.race([timeoutPromise, checkIsVmRunningPromise]);
 
     if (wait) {

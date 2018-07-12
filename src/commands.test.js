@@ -12,18 +12,36 @@ import config from './config';
 jest.mock('./config');
 
 describe('shutdownVm()', () => {
-    test('it calls softShutdown()', async () => {
+    test('it calls softShutdown() when isRunningVm is true', async () => {
+        const vmName = '';
         shell.softShutdown = jest.fn(() => Promise.resolve());
-        shell.isRunningVm = jest.fn(() => Promise.resolve(false));
-        await shutdownVmWithTimeout();
+        const delayInSeconds = 0.01;
+        const timeoutInSeconds = 0.05;
+        const responses = [...Array(9).fill(true), false];
+        shell.isRunningVm = jest.fn(() => Promise.resolve(responses.shift()));
+        await shutdownVmWithTimeout(vmName, delayInSeconds, timeoutInSeconds);
 
         expect(shell.softShutdown.mock.calls.length).toBe(1);
     });
 
+    test('it doesn`t call softShutdown() when isRunningVm is false', async () => {
+        const vmName = '';
+        shell.softShutdown = jest.fn(() => Promise.resolve());
+        const delayInSeconds = 0.01;
+        const timeoutInSeconds = 0.05;
+        shell.isRunningVm = jest.fn(() => Promise.resolve(false));
+        await shutdownVmWithTimeout(vmName, delayInSeconds, timeoutInSeconds);
+
+        expect(shell.softShutdown.mock.calls.length).toBe(0);
+    });
+
     test('it calls isRunningVm()', async () => {
+        const vmName = '';
         shell.softShutdown = jest.fn(() => Promise.resolve());
         shell.isRunningVm = jest.fn(() => Promise.resolve(false));
-        await shutdownVmWithTimeout();
+        const delayInSeconds = 0.01;
+        const timeoutInSeconds = 0.05;
+        await shutdownVmWithTimeout(vmName, delayInSeconds, timeoutInSeconds);
 
         expect(shell.isRunningVm.mock.calls.length).toBeGreaterThan(0);
     });
@@ -40,7 +58,7 @@ describe('shutdownVm()', () => {
         expect(shell.isRunningVm.mock.calls.length).toBe(10);
     });
 
-    test('it calls isRunningVm() 5 times with before timing out', async () => {
+    test('it calls isRunningVm() 1+5 times with before timing out', async () => {
         const vmName = '';
         const delayInSeconds = 0.01;
         const timeoutInSeconds = 0.05;
@@ -50,15 +68,14 @@ describe('shutdownVm()', () => {
         shell.forceShutdown = jest.fn(() => Promise.resolve());
         await shutdownVmWithTimeout(vmName, delayInSeconds, timeoutInSeconds);
 
-        expect(shell.isRunningVm.mock.calls.length).toBe(5);
+        expect(shell.isRunningVm.mock.calls.length).toBe(1+5); // once for initial check
     });
 
-    test('it calls forceShutdown() when timing out', async () => {
+    test('it calls forceShutdown() when timed out and vm is running', async () => {
         const vmName = '';
         const delayInSeconds = 0.01;
         const timeoutInSeconds = 0.05;
-        const responses = [...Array(9).fill(true), false];
-        shell.isRunningVm = jest.fn(() => Promise.resolve(responses.shift()));
+        shell.isRunningVm = jest.fn(() => Promise.resolve(true));
         shell.softShutdown = jest.fn(() => Promise.resolve());
         shell.forceShutdown = jest.fn(() => Promise.resolve());
 
@@ -81,7 +98,7 @@ describe('startVm()', () => {
 describe('copyVm()', () => {
     test('it calls shell.copyFile()', async () => {
         shell.copyFile = jest.fn(() => Promise.resolve());
-        await copyVm();
+        await copyVm('');
 
         expect(shell.copyFile.mock.calls.length).toBe(1);
     });
