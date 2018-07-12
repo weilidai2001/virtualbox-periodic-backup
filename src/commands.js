@@ -20,10 +20,12 @@ import {
 
 import config from './config';
 
+let allowCheckingVmIsRunning = true;
+
 const periodicallyCheckIsVmRunningUntilNotRunning = async (sleepInSec, vmName) => {
     const isVmRunning = await isRunningVm(vmName);
 
-    if (isVmRunning) {
+    if (isVmRunning || allowCheckingVmIsRunning) {
         await delay(sleepInSec);
         await periodicallyCheckIsVmRunningUntilNotRunning(sleepInSec, vmName);
     }
@@ -57,6 +59,8 @@ export async function shutdownVmWithTimeout(
     const checkIsVmRunningPromise = periodicallyCheckIsVmRunningUntilNotRunning(statusCheckFrequencyInSec * 1000, vmName);
     await Promise.race([timeoutPromise, checkIsVmRunningPromise]);
 
+    allowCheckingVmIsRunning = false;
+
     if (wait) {
         clearTimeout(wait);
     }
@@ -66,24 +70,28 @@ export function startVm(vmName) {
     return start(vmName);
 }
 
-export async function copyVm(vmFileName) {
+export async function copyVm(vmFileName, srcDirParam, destDirParam) {
+    const srcDirectory = srcDirParam || config.srcDirectory;
+    const destDirectory = destDirParam || config.destDirectory;
     const timestamp = now().toISOString();
     const fileNameValidTimestamp = replaceAll(timestamp, ':', '_');
-    const srcPath = config.srcDirectory + vmFileName;
+    const srcPath = srcDirectory + vmFileName;
     const newFileName = `${path.basename(vmFileName, path.extname(vmFileName))} ${fileNameValidTimestamp}${path.extname(vmFileName)}`;
-    const destPath = config.destDirectory + newFileName;
+    const destPath = destDirectory + newFileName;
     await copyFile(srcPath, destPath);
     return newFileName;
 }
 
-export function checkVmCopiedCorrectly(srcFileName, destFileName) {
-    const srcPath = config.srcDirectory + srcFileName;
-    const destPath = config.destDirectory + destFileName;
+export function checkVmCopiedCorrectly(srcFileName, destFileName, srcDirParam, destDirParam) {
+    const srcDirectory = srcDirParam || config.srcDirectory;
+    const destDirectory = destDirParam || config.destDirectory;
+    const srcPath = srcDirectory + srcFileName;
+    const destPath = destDirectory + destFileName;
     return isFilesIdentical(srcPath, destPath);
 }
 
 
-export async function deleteOldestVmOverLimit(vmFileName, limit = 3) {
+export async function deleteOldestVmOverLimit(vmFileName, limit = 3, destDirParam) {
     const compareFileNameByDate = (a, b) => {
         const fileNameA = path.basename(a, path.extname(a));
         const fileNameB = path.basename(b, path.extname(b));
@@ -94,7 +102,9 @@ export async function deleteOldestVmOverLimit(vmFileName, limit = 3) {
         return new Date(dateA) - new Date(dateB);
     };
 
-    const allBackupFiles = await getAllFilesFromDirectory(config.destDirectory);
+    const destDirectory = destDirParam || config.destDirectory;
+
+    const allBackupFiles = await getAllFilesFromDirectory(destDirectory);
     const relevantBackupFiles = allBackupFiles.filter(file => path.basename(file).includes(vmFileName));
     const sortedByDate = relevantBackupFiles.sort(compareFileNameByDate);
     const noOfFilesToDelete = sortedByDate.length - limit > 0 ? sortedByDate.length - limit : 0;

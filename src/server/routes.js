@@ -28,23 +28,55 @@ app.get('/backup', (req, res) => {
         currentStatus = 'Beginning backup';
         const vmName = req.query.vmName || config.vmName;
         const vmFileName = req.query.vmFileName || config.vmFileName;
+        const checkInterval = req.query.interval || 5;
+        const timeout = req.query.timeout || 180;
+        const srcDirectory = req.query.srcDir;
+        const destDirectory = req.query.destDir;
 
         currentStatus = 'Waiting for shutdown';
-        await shutdownVmWithTimeout(vmName);
+        await shutdownVmWithTimeout(vmName, checkInterval, timeout);
 
         currentStatus = 'Starting copy';
-        const newName = await copyVm(vmFileName);
+        const newName = await copyVm(vmFileName, srcDirectory, destDirectory);
 
         currentStatus = 'Checking copy';
-        await checkVmCopiedCorrectly(vmFileName, newName);
+        await checkVmCopiedCorrectly(vmFileName, newName, srcDirectory, destDirectory);
 
         currentStatus = 'Deleting old';
-        await deleteOldestVmOverLimit(vmName);
+        await deleteOldestVmOverLimit(vmName, 2, destDirectory);
 
         currentStatus = 'Restarting vm';
         await startVm(vmName);
 
         currentStatus = 'Idle';
+    })();
+});
+
+app.get('/shutdown', (req, res) => {
+    res.json({
+        status: 'shutdown instruction received'
+    });
+
+    (async function shutdown(){
+        const vmName = req.query.vmName || config.vmName;
+        const checkInterval = req.query.interval || 5;
+        const timeout = req.query.timeout || 180;
+
+        await shutdownVmWithTimeout(vmName, checkInterval, timeout);
+
+    })();
+});
+
+app.get('/start', (req, res) => {
+    res.json({
+        status: 'startup instruction received'
+    });
+
+    (async function start(){
+        const vmName = req.query.vmName || config.vmName;
+
+        await startVm(vmName);
+
     })();
 });
 
