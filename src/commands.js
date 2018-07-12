@@ -106,7 +106,7 @@ export async function deleteOldestVmOverLimit(vmFileName, limit = 3, destDirPara
 
     const allBackupFiles = await getAllFilesFromDirectory(destDirectory);
     const relevantBackupFiles = allBackupFiles.filter(file => path.basename(file).includes(vmFileName));
-    logger.info(`Found ${relevantBackupFiles.length} backup files and the limit is ${limit}`);
+    logger.info(`Found ${allBackupFiles.length} files, ${relevantBackupFiles.length} are relevant backup files and the limit is ${limit}`);
     const sortedByDate = relevantBackupFiles.sort(compareFileNameByDate);
     const noOfFilesToDelete = sortedByDate.length - limit > 0 ? sortedByDate.length - limit : 0;
     logger.info(`${noOfFilesToDelete} files are about to be deleted`);
