@@ -10,6 +10,8 @@ import {
     getAllFilesFromDirectory,
     deleteFile,
 } from './shell';
+import util from 'util';
+const delay = util.promisify(setTimeout);
 
 import {
     replaceAll,
@@ -18,19 +20,13 @@ import {
 
 import config from './config';
 
-const periodicallyCheckIsVmRunningUntilNotRunning = (sleepInSec, vmName) => {
-    return new Promise((res) => {
-        isRunningVm(vmName).then(isVmRunning => {
-            if (isVmRunning) {
-                setTimeout(() => {
-                    res(periodicallyCheckIsVmRunningUntilNotRunning(sleepInSec, vmName));
-                }, sleepInSec);
-            } else {
-                res();
-            }
-        });
+const periodicallyCheckIsVmRunningUntilNotRunning = async (sleepInSec, vmName) => {
+    const isVmRunning = await isRunningVm(vmName);
 
-    });
+    if (isVmRunning) {
+        await delay(sleepInSec);
+        await periodicallyCheckIsVmRunningUntilNotRunning(sleepInSec, vmName);
+    }
 };
 
 export async function shutdownVmWithTimeout(
@@ -40,7 +36,7 @@ export async function shutdownVmWithTimeout(
     ) {
     logger.info(`VM shutdown requested with status checking every ${statusCheckFrequencyInSec}s and a timeout of ${timeoutInSec}s`);
 
-    if (!await isRunningVm()) {
+    if (!await isRunningVm(vmName)) {
         return;
     }
 
