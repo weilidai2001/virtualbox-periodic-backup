@@ -43,12 +43,27 @@ app.get('/backup', (req, res) => {
         await checkVmCopiedCorrectly(vmFileName, newName, srcDirectory, destDirectory);
 
         currentStatus = 'Deleting old';
-        await deleteOldestVmOverLimit(vmName, 2, destDirectory);
+        await deleteOldestVmOverLimit(vmFileName, 2, destDirectory);
 
         currentStatus = 'Restarting vm';
         await startVm(vmName);
 
         currentStatus = 'Idle';
+    })();
+});
+
+app.get('/delete-overflow', (req, res) => {
+    res.json({
+        status: 'delete-overflow instruction received'
+    });
+
+    (async function doBackup(){
+        const vmFileName = req.query.vmFileName || config.vmFileName;
+        const destDirectory = req.query.destDir;
+
+        currentStatus = 'Deleting old';
+        await deleteOldestVmOverLimit(vmFileName, 2, destDirectory);
+
     })();
 });
 
