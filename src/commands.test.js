@@ -12,7 +12,7 @@ import config from './config';
 jest.mock('./config');
 
 describe('shutdownVm()', () => {
-    test('it calls softShutdown() when isRunningVm is true', async () => {
+    test('it calls softShutdown() 3 times when isRunningVm is true', async () => {
         const vmName = '';
         shell.softShutdown = jest.fn(() => Promise.resolve());
         const delayInSeconds = 0.01;
@@ -21,7 +21,7 @@ describe('shutdownVm()', () => {
         shell.isRunningVm = jest.fn(() => Promise.resolve(responses.shift()));
         await shutdownVmWithTimeout(vmName, delayInSeconds, timeoutInSeconds);
 
-        expect(shell.softShutdown.mock.calls.length).toBe(1);
+        expect(shell.softShutdown.mock.calls.length).toBe(3);
     });
 
     test('it doesn`t call softShutdown() when isRunningVm is false', async () => {

@@ -41,6 +41,8 @@ export async function shutdownVmWithTimeout(
     }
 
     await softShutdown(vmName);
+    await softShutdown(vmName); // sometimes on Windows the first shutdown signal is ignored
+    await softShutdown(vmName); // sometimes on Windows the first shutdown signal is ignored
 
     let wait;
     const timeoutPromise = new Promise((res) => {
