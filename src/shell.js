@@ -25,7 +25,7 @@ export async function forceShutdown(vmName) {
 
 export async function softShutdown(vmName) {
     logger.info(`soft shutdown ${vmName}`);
-    const command = `${config.virtualBoxExecPath} controlvm ${vmName} acpipowerbutton`;
+    const command = `${config.virtualBoxExecPath} controlvm "${vmName}" acpipowerbutton`;
     await exec(command);
 }
 
