@@ -191,7 +191,7 @@ describe('deleteOldestVm()', () => {
     });
 
     test('it calls shell.deletFile() on the 3 oldest filenames over the limit', async () => {
-        const vmFileName = 'FileA';
+        const vmFileName = 'FileA.ext';
         const fakeBackupFiles = [
             'backup_dir/WrongName 2018-07-07T10_10_00.260Z.ext',
             'backup_dir/FileA 2018-07-06T10_10_00.260Z.ext',
