@@ -149,9 +149,10 @@ describe('checkVmCopiedCorrectly()', () => {
 
 describe('deleteOldestVm()', () => {
     test('it calls shell.deletFile() on the oldest filename', async () => {
-        const vmFileName = 'FileA';
+        const vmFileName = 'FileA.ext';
         const fakeBackupFiles = [
             'backup_dir/WrongName 2018-07-07T10_10_00.260Z.ext',
+            'backup_dir/FileA_directory',
             'backup_dir/FileA 2018-07-08T10_10_00.260Z.ext',
             'backup_dir/FileA 2018-07-09T10_10_00.260Z.ext',
             'backup_dir/FileA 2018-07-10T10_10_00.260Z.ext',
